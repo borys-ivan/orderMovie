@@ -9,13 +9,12 @@ import com.example.orderMovie.domain.query.QueryUtils;
 import com.example.orderMovie.dto.order.OrderCreateUpdateDto;
 import com.example.orderMovie.dto.order.OrderViewDto;
 import com.example.orderMovie.repository.jpa.OrderRepository;
-import liquibase.repackaged.org.apache.commons.collections4.IterableUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -25,9 +24,11 @@ import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -40,6 +41,7 @@ public class OrderServiceImpl implements OrderService {
     private final QueryUtils queryUtils;
     private final ConvertUtils convertUtils;
 
+    String[] SORT = {"orderID", "price", "hall", "customerName", "customerAge", "dateSession"};
 
     @Override
     public Order findByID(long orderID) {
@@ -126,8 +128,24 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public SearchResult<OrderViewDto> searchList(SearchParams searchParams) {
+        List<String> sortableFields = Arrays.stream(SORT).collect(Collectors.toList());
         List<Sort.Order> sortOrders = new ArrayList<>();
-        sortOrders.add(Sort.Order.asc("orderID"));
+
+        Sort.Direction direction;
+        if ( "ASC".equalsIgnoreCase(searchParams.getSortDirection()) || "DESC".equalsIgnoreCase(searchParams.getSortDirection()) ) {
+            direction = Sort.Direction.valueOf(searchParams.getSortDirection().toUpperCase());
+        } else {
+            direction = Sort.Direction.ASC;
+        }
+
+        String sortBy;
+        if (sortableFields.contains(searchParams.getSortByField())) {
+            sortBy = searchParams.getSortByField();
+        } else {
+            sortBy = "orderID";
+        }
+        Sort.Order sort = new Sort.Order(direction, sortBy);
+        sortOrders.add(sort);
 
         PageRequest page = PageRequest.of(searchParams.getPage(), searchParams.getSizeOfPage(), Sort.by(sortOrders));
 
@@ -136,8 +154,7 @@ public class OrderServiceImpl implements OrderService {
             Specification<Order> orderSpecification = Specification.where(queryUtils.createSpecification(searchParams));
             order = orderRepository.findAll(orderSpecification, page);
         } else {
-            List<Order> list = IterableUtils.toList(orderRepository.findAll());
-            order = new PageImpl<Order>(list, page, list.size());
+            order = orderRepository.findAll(page);
         }
 
         return queryUtils.convertSearchResult(order, page, OrderViewDto.class);

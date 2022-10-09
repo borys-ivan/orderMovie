@@ -58,7 +58,7 @@ public class MovieTests {
     }
 
     @Test
-    public void DeleteOrder()  {
+    public void deleteOrder()  {
         when(movieRepository.findById(any(Long.class))).thenReturn(Optional.of(movie));
         MovieViewDto responseMethod = movieService.delete(movie.getMovieID());
 

@@ -19,6 +19,10 @@ target/
 *.iml
 *.ipr
 
+### DB folder ###
+data/orderMovie.mv.db
+data/orderMovie.trace.db
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

@@ -103,7 +103,7 @@ public class SearchListTests {
 
     private Order createOrder() {
         Order order = new Order();
-        order.setOrderID(1000L);
+        order.setOrderID(1L);
         order.setCustomerName("John");
         order.setCustomerAge(27);
         order.setPrice(BigDecimal.valueOf(10.00));
@@ -115,7 +115,7 @@ public class SearchListTests {
 
     private Movie createMovie() {
         Movie movie = new Movie();
-        movie.setMovieID(1000L);
+        movie.setMovieID(1L);
         movie.setAgeLimit(16);
         movie.setTitle("Hot-weells");
         movie.setRating(10);

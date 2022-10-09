@@ -22,4 +22,9 @@ public class SearchParams {
     private int page = 0;
     @ApiModelProperty(notes = "Items per page", example = "10")
     private int sizeOfPage = 10;
+
+    @ApiModelProperty(example = "ASC")
+    private String sortDirection;
+
+    private String sortByField;
 }

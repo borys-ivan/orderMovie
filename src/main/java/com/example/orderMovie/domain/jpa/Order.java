@@ -37,6 +37,9 @@ public class Order {
     @Column(name = "customer_name")
     private String customerName;
 
+    @Column(name = "hall")
+    private String hall;
+
     @Column(name = "customer_age")
     private Integer customerAge;
 
